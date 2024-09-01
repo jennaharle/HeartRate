@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
-export default function IndexScreen() {
+export default function App() {
   const [age, setAge] = useState('');
-  const [lowerLimit, setLowerLimit] = useState<number | null>(null);
-  const [upperLimit, setUpperLimit] = useState<number | null>(null);
+  const [lowerLimit, setLowerLimit] = useState(null);
+  const [upperLimit, setUpperLimit] = useState(null);
 
   const calculateHeartRateLimits = () => {
-    const ageNumber = parseFloat(age.replace(',', '.')); // Korvataan pilkku pisteellä
+    const ageNumber = parseInt(age, 10);
+
     if (!isNaN(ageNumber)) {
       const lower = (220 - ageNumber) * 0.65;
       const upper = (220 - ageNumber) * 0.85;
-      setLowerLimit(lower);
-      setUpperLimit(upper);
+
+      setLowerLimit(lower.toFixed(2));
+      setUpperLimit(upper.toFixed(2));
     } else {
       setLowerLimit(null);
       setUpperLimit(null);
@@ -21,19 +24,21 @@ export default function IndexScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sydämen sykkeen rajat urheiluun</Text>
+      <StatusBar style="auto" />
+      <Text style={styles.header}>Sydämen Sykkeen Rajoitusten Laskuri</Text>
+      <Text>Syötä ikäsi:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Syötä ikäsi"
         keyboardType="numeric"
         value={age}
         onChangeText={setAge}
+        placeholder="Syötä ikä"
       />
-      <Button title="Laske rajat" onPress={calculateHeartRateLimits} />
+      <Button title="Laske" onPress={calculateHeartRateLimits} />
       {lowerLimit !== null && upperLimit !== null && (
         <View style={styles.resultContainer}>
-          <Text style={styles.resultText}>Alempi raja: {lowerLimit.toFixed(2)} bpm</Text>
-          <Text style={styles.resultText}>Ylempi raja: {upperLimit.toFixed(2)} bpm</Text>
+          <Text style={styles.resultText}>Alaraja: {lowerLimit} bpm</Text>
+          <Text style={styles.resultText}>Yläraja: {upperLimit} bpm</Text>
         </View>
       )}
     </View>
@@ -45,22 +50,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
   },
-  title: {
-    fontSize: 20,
-    marginBottom: 20,
+  header: {
+    fontSize: 24,
+    marginBottom: 16,
   },
   input: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    width: '100%',
-    marginBottom: 20,
-    paddingHorizontal: 10,
+    marginBottom: 12,
+    width: '80%',
+    paddingHorizontal: 8,
   },
   resultContainer: {
-    marginTop: 20,
+    marginTop: 16,
+    alignItems: 'center',
   },
   resultText: {
     fontSize: 18,
